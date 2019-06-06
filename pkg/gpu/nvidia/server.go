@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/NVIDIA/gpu-monitoring-tools/bindings/go/nvml"
 	log "github.com/golang/glog"
-
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	pluginapi "k8s.io/kubernetes/pkg/kubelet/apis/deviceplugin/v1beta1"
@@ -20,6 +20,7 @@ type NvidiaDevicePlugin struct {
 	realDevNames []string
 	devNameMap   map[string]uint
 	devIndxMap   map[uint]string
+	devTopology  map[string]map[string]topologyType
 	socket       string
 	mps          bool
 	healthCheck  bool
@@ -30,6 +31,8 @@ type NvidiaDevicePlugin struct {
 	server *grpc.Server
 	sync.RWMutex
 }
+
+type topologyType nvml.P2PLinkType
 
 // NewNvidiaDevicePlugin returns an initialized NvidiaDevicePlugin
 func NewNvidiaDevicePlugin(mps, healthCheck bool) *NvidiaDevicePlugin {
@@ -43,6 +46,8 @@ func NewNvidiaDevicePlugin(mps, healthCheck bool) *NvidiaDevicePlugin {
 	log.Infof("Device Map: %v", devNameMap)
 	log.Infof("Device List: %v", devList)
 
+	devTopology := getTopology()
+	
 	err := patchGPUCount(len(devList))
 	if err != nil {
 		log.Infof("Failed due to %v", err)
@@ -52,6 +57,7 @@ func NewNvidiaDevicePlugin(mps, healthCheck bool) *NvidiaDevicePlugin {
 		devs:         devs,
 		realDevNames: devList,
 		devNameMap:   devNameMap,
+		devTopology:  devTopology,
 		socket:       serverSock,
 		mps:          mps,
 		healthCheck:  healthCheck,
