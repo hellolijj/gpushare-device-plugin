@@ -42,11 +42,12 @@ func NewNvidiaDevicePlugin(mps, healthCheck bool) *NvidiaDevicePlugin {
 	for dev, _ := range devNameMap {
 		devList = append(devList, dev)
 	}
-
+	
+	devTopology := getTopology()
+	
 	log.Infof("Device Map: %v", devNameMap)
 	log.Infof("Device List: %v", devList)
-
-	devTopology := getTopology()
+	log.Infof("Device Topology: %v", devTopology)
 	
 	err := patchGPUCount(len(devList))
 	if err != nil {
