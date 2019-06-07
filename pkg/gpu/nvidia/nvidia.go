@@ -104,7 +104,7 @@ func getTopology() (map[string]map[string]topologyType) {
 		for j := 0; j < int(n); j++ {
 			t, err := nvml.GetP2PLink(devs[i], devs[j])
 			check(err)
-			topology[generateFakeDeviceID(devs[i].UUID, uint(i))] = map[string]topologyType{generateFakeDeviceID(devs[j].UUID, uint(j)): topologyType(t)}
+			topology[devs[i].UUID] = map[string]topologyType{devs[j].UUID: topologyType(t)}
 		}
 	}
 	
