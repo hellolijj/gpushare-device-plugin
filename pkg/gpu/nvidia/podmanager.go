@@ -76,6 +76,7 @@ func patchGPUCount(gpuCount int) error {
 	newNode.Status.Capacity["lijj.com/count"] = *resource.NewQuantity(int64(34), resource.DecimalSI)
 	newNode.Status.Allocatable["lijj.com/count"] = *resource.NewQuantity(int64(34), resource.DecimalSI)
 	fmt.Println(newNode.Status)
+	log.Info("test value: ", newNode.Status)
 	// content := fmt.Sprintf(`[{"op": "add", "path": "/status/capacity/aliyun.com~gpu-count", "value": "%d"}]`, gpuCount)
 	// _, err = clientset.CoreV1().Nodes().PatchStatus(nodeName, []byte(content))
 	_, _, err = nodeutil.PatchNodeStatus(clientset.CoreV1(), types.NodeName(nodeName), node, newNode)
